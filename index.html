@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>✿ The Shoppe ✿</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0f0a0d;
+  --black2: #1a1018;
+  --black3: #221820;
+  --pink: #f472b6;
+  --pink-light: #fce7f3;
+  --pink-mid: #fbcfe8;
+  --pink-hot: #ec4899;
+  --pink-deep: #be185d;
+  --white: #fff9fc;
+  --cream: #fdf4f8;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  cursor: none;
+  overflow-x: hidden;
+}
+
+/* ── Custom cursor ── */
+#cursor {
+  position: fixed;
+  width: 18px; height: 18px;
+  background: var(--pink);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.08s ease, background 0.2s;
+  mix-blend-mode: difference;
+}
+body:hover #cursor { opacity: 1; }
+
+/* ── Floating background stars/dots ── */
+.bg-deco {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.bg-deco span {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--pink);
+  opacity: 0.04;
+  animation: floatDot linear infinite;
+}
+
+@keyframes floatDot {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0.04; }
+  50%  { opacity: 0.08; }
+  100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}
+
+/* ── Header ── */
+header {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 72px 24px 52px;
+}
+
+.header-badge {
+  display: inline-block;
+  background: var(--pink-deep);
+  color: var(--pink-light);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 999px;
+  margin-bottom: 22px;
+}
+
+.wiggle-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--white);
+  position: relative;
+  display: inline-block;
+}
+
+.wiggle-title .pop {
+  color: var(--pink);
+  font-style: italic;
+  display: inline-block;
+  animation: wobble 3s ease-in-out infinite;
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(-2deg) scale(1); }
+  50%       { transform: rotate(2deg) scale(1.04); }
+}
+
+.header-sub {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #a0768c;
+  letter-spacing: 0.06em;
+}
+
+.squiggle {
+  display: block;
+  margin: 24px auto 0;
+  width: 120px;
+  height: 16px;
+}
+
+/* ── Enter Product Button ── */
+.enter-product-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+  background: transparent;
+  border: 1.5px solid var(--pink);
+  color: var(--pink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 11px 26px;
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: none;
+  position: relative;
+  overflow: hidden;
+  transition: color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.enter-product-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--pink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.34,1.2,0.64,1);
+  z-index: 0;
+}
+
+.enter-product-btn:hover::before {
+  transform: scaleX(1);
+}
+
+.enter-product-btn:hover {
+  color: var(--black);
+  box-shadow: 0 6px 24px rgba(244,114,182,0.35);
+  transform: translateY(-2px);
+}
+
+.enter-product-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.enter-product-btn .btn-icon {
+  position: relative;
+  z-index: 1;
+  font-size: 15px;
+  transition: transform 0.25s ease;
+}
+
+.enter-product-btn:hover .btn-icon {
+  transform: rotate(90deg);
+}
+
+/* ── Filter pills ── */
+.filters {
+  position: relative; z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 24px 44px;
+}
+
+.pill {
+  background: transparent;
+  border: 1px solid rgba(244,114,182,0.25);
+  color: #a0768c;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 18px;
+  border-radius: 999px;
+  cursor: none;
+  transition: all 0.2s ease;
+}
+
+.pill:hover, .pill.active {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: var(--black);
+  transform: translateY(-2px);
+}
+
+/* ── Grid ── */
+.grid-wrap {
+  position: relative; z-index: 2;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--black2);
+  border: 1px solid rgba(244,114,182,0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), border-color 0.3s, box-shadow 0.3s;
+  animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.88) translateY(16px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.card:nth-child(1)  { animation-delay: 0.05s; }
+.card:nth-child(2)  { animation-delay: 0.10s; }
+.card:nth-child(3)  { animation-delay: 0.15s; }
+.card:nth-child(4)  { animation-delay: 0.20s; }
+.card:nth-child(5)  { animation-delay: 0.25s; }
+.card:nth-child(6)  { animation-delay: 0.30s; }
+.card:nth-child(7)  { animation-delay: 0.35s; }
+.card:nth-child(8)  { animation-delay: 0.40s; }
+.card:nth-child(9)  { animation-delay: 0.45s; }
+.card:nth-child(10) { animation-delay: 0.50s; }
+.card:nth-child(11) { animation-delay: 0.55s; }
+.card:nth-child(12) { animation-delay: 0.60s; }
+
+.card:hover {
+  transform: translateY(-8px) rotate(0.5deg);
+  border-color: rgba(244,114,182,0.45);
+  box-shadow: 0 20px 50px rgba(236,72,153,0.18);
+}
+
+/* tall feature card */
+.card.tall .img-wrap { aspect-ratio: 3/5; }
+
+.img-wrap {
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  background: var(--black3);
+  position: relative;
+}
+
+.img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94);
+  filter: saturate(0.85);
+}
+
+.card:hover .img-wrap img { transform: scale(1.07); }
+
+/* sticker badge */
+.sticker {
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 54px; height: 54px;
+  background: var(--pink);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--black);
+  text-align: center;
+  line-height: 1.2;
+  animation: spin 8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.sticker.hot { background: var(--pink-hot); }
+.sticker.new-in { background: #f9a8d4; }
+
+.wish-btn {
+  position: absolute;
+  top: 12px; left: 12px;
+  width: 34px; height: 34px;
+  background: rgba(15,10,13,0.7);
+  border: 1px solid rgba(244,114,182,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  cursor: none;
+  transition: background 0.2s, transform 0.2s;
+  backdrop-filter: blur(4px);
+}
+.wish-btn:hover { background: var(--pink); transform: scale(1.15); }
+
+/* quick-add ribbon */
+.quick-add {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(236,72,153,0.92);
+  color: var(--black);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 12px;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.34,1.2,0.64,1);
+  cursor: none;
+}
+.card:hover .quick-add { transform: translateY(0); }
+
+/* card body */
+.card-body {
+  padding: 16px 18px 20px;
+  display: flex; flex-direction: column; gap: 5px;
+  flex: 1;
+}
+
+.card-cat {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pink-deep);
+}
+
+.card-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--white);
+}
+
+.card-desc {
+  font-size: 12.5px;
+  color: #7a5568;
+  line-height: 1.6;
+  margin-top: 2px;
+  flex: 1;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(244,114,182,0.1);
+}
+
+.price {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--pink);
+}
+
+.old-price {
+  font-size: 12px;
+  color: #5a3d4f;
+  text-decoration: line-through;
+  margin-left: 6px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.hearts {
+  display: flex; gap: 2px;
+  font-size: 11px;
+}
+
+/* ── Footer ── */
+footer {
+  position: relative; z-index: 2;
+  text-align: center;
+  padding: 40px 24px 60px;
+  border-top: 1px solid rgba(244,114,182,0.08);
+}
+
+footer p {
+  font-size: 12px;
+  color: #5a3d4f;
+  letter-spacing: 0.1em;
+}
+
+footer .footer-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-style: italic;
+  color: var(--pink);
+  margin-bottom: 10px;
+}
+
+@media (max-width: 600px) {
+  .grid-wrap { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 12px 60px; }
+  .wiggle-title { font-size: 42px; }
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+
+<!-- Floating background dots -->
+<div class="bg-deco" id="bgDeco"></div>
+
+<header>
+  <div class="header-badge">✦ New arrivals ✦</div>
+  <h1 class="wiggle-title">The <span class="pop">Shoppe</span></h1>
+  <p class="header-sub">Replace these with your own darling products ✿</p>
+  <svg class="squiggle" viewBox="0 0 120 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 8 Q10 0 20 8 Q30 16 40 8 Q50 0 60 8 Q70 16 80 8 Q90 0 100 8 Q110 16 120 8" stroke="#f472b6" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  </svg>
+  <a href="add-product.html" class="enter-product-btn">
+    <span class="btn-icon">✦</span>
+    <span>Enter Product</span>
+  </a>
+</header>
+
+<div class="filters">
+  <button class="pill active">All</button>
+  <button class="pill">Skincare</button>
+  <button class="pill">Fragrance</button>
+  <button class="pill">Accessories</button>
+  <button class="pill">Candles</button>
+  <button class="pill">Jewellery</button>
+</div>
+
+<div class="grid-wrap">
+
+  <!-- 1 -->
+  <div class="card tall">
+    <div class="img-wrap">
+      <div class="wish-btn">♡</div>
+      <div class="sticker hot">🔥<br>Hot</div>
+      <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&q=80" alt="Rose Face Serum" />
+      <div class="quick-add">+ Quick Add</div>
+    </div>
+    <div class="card-body">
+      <span class="card-cat">Skincare</span>
+      <h2 class="card-name">Rose Glow Serum</h2>
+      <p class="card-desc">Hyaluronic + rosehip oil. Plump, dewy, obsession-worthy.</p>
+      <div class="card-footer">
+        <div><span class="price">$48</span><span class="old-price">$65</span></div>
+        <div class="hearts">🩷🩷🩷🩷🩷</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="card">
+    <div class="img-wrap">
+      <div class="wish-btn">♡</div>
+      <div class="sticker new-in">New<br>In</div>
+      <img src="https://images.unsplash.com/photo-1541643600914-78b084683702?w=600&q=80" alt="Perfume" />
+      <div class="quick-add">+ Quick Add</div>
+    </div>
+    <div class="card-body">
+      <span class="card-cat">Fragrance</span>
+      <h2 class="card-name">Velvet Peonies</h2>
+      <p class="card-desc">Peony, musk, white tea. Softly intoxicating.</p>
+      <div class="card-footer">
+        <div><span class="price">$92</span></div>
+        <div class="hearts">🩷🩷🩷🩷🤍</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="card">
+    <div class="img-wrap">
+      <div class="wish-btn">♡</div>
+      <img src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&q=80" alt="Lip Gloss" />
+      <div class="quick-add">+ Quick Add</div>
+    </div>
+    <div class="card-body">
+      <span class="card-cat">Makeup</span>
+      <h2 class="card-name">Glass Lip Gloss</h2>
+      <p class="card-desc">Mirror-finish plumping gloss in 8 shades.</p>
+      <div class="card-footer">
+        <div><span class="price">$22</span></div>
+        <div class="hearts">🩷🩷🩷🩷🩷</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="card">
+    <div class="img-wrap">
+      <div class="wish-btn">♡</div>
+      <div class="sticker">Sale<br>20%</div>
+      <img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=600&q=80" alt="Crystal Candle" />
+      <div class="quick-add">+ Quick Add</div>
+    </div>
+    <div class="card-body">
+      <span class="card-cat">Candles</span>
+      <h2 class="card-name">Crystalline Bloom</h2>
+      <p class="card-desc">Soy wax with real rose petals. 50hr burn time.</p>
+      <div class="card-footer">
+        <div><span class="price">$36</span><span class="old-price">$45</span></div>
+        <div class="hearts">🩷🩷🩷🩷🤍</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="card">
+    <div class="img-wrap">
+      <div class="wish-btn">♡</div>
+      <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80" alt="Pearl Earrings" />
+      <div class="quick-add">+ Quick Add</div>
+    </div>
+    <div class="card-body">
+      <span class="card-cat">Jewellery</span>
+      <h2 class="card-name">Baroque Pearl Drops</h2>
+      <p class="card-desc">Freshwater pearls, 18k gold-plated hooks.</p>
+      <div class="card-footer">
+        <div><span class="price">$68</span></div>
+        <div class="hearts">🩷🩷🩷🩷🩷</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="card tall">
+    <div class="img-wrap">
+      <div class="wish-btn">♡</div>
+      <div class="sticker hot">Best<br>Buy</div>
+      <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&q=80" alt="Makeup Brushes" />
+      <div class="quick-add">+ Quick Add</div>
+    </div>
+    <div class="card-body">
+      <span class="card-cat">Tools</span>
+      <h2 class="card-name">Blush Brush Set</h2>
+      <p class="card-desc">12-piece vegan brush set with pink marble handles.</p>
+      <div class="card-footer">
+        <div><span class="price">$54</span><span class="old-price">$72</span></div>
+        <div class="hearts">🩷🩷🩷🩷🩷</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7 -->
+  <div class="card">
+    <div class="img-wrap">
+      <div class="wish-btn">♡</div>
+      <div class="sticker new-in">New<br>In</div>
+      <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80" alt="Tote Bag" />
+      <div class="quick-add">+ Quick Add</div>
+    </div>
+    <div class="card-body">
+      <span class="card-cat">Accessories</span>
+      <h2 class="card-name">Cloud Tote Bag</h2>
+      <p class="card-desc">Puffy nylon, magnetic clasp. Holds everything.</p>
+      <div class="card-footer">
+        <div><span class="price">$85</span></div>
+        <div class="hearts">🩷🩷🩷🩷🤍</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8 -->
+  <div class="card">
+    <div class="img-wrap">
+      <div class="wish-btn">♡</div>
+      <img src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&q=80" alt="Face Roller" />
+      <div class="quick-add">+ Quick Add</div>
+    </div>
+    <div class="card-body">
+      <span class="card-cat">Skincare</span>
+      <h2 class="card-name">Rose Quartz Roller</h2>
+      <p class="card-desc">Depuff and lift with every morning roll.</p>
+      <div class="card-footer">
+        <div><span class="price">$29</span></div>
+        <div class="hearts">🩷🩷🩷🩷🩷</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9 -->
+  <div class="card">
+    <div class="img-wrap">
+      <div class="wish-btn">♡</div>
+      <div class="sticker">Duo<br>Set</div>
+      <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=600&q=80" alt="Body Butter" />
+      <div class="quick-add">+ Quick Add</div>
+    </div>
+    <div class="card-body">
+      <span class="card-cat">Body</span>
+      <h2 class="card-name">Whipped Body Butter</h2>
+      <p class="card-desc">Shea + mango butter. Melts on contact, zero grease.</p>
+      <div class="card-footer">
+        <div><span class="price">$38</span></div>
+        <div class="hearts">🩷🩷🩷🩷🤍</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="card">
+    <div class="img-wrap">
+      <div class="wish-btn">♡</div>
+      <img src="https://images.unsplash.com/photo-1590156206657-aab55f866604?w=600&q=80" alt="Hair Claw" />
+      <div class="quick-add">+ Quick Add</div>
+    </div>
+    <div class="card-body">
+      <span class="card-cat">Hair</span>
+      <h2 class="card-name">Butterfly Claw Clip</h2>
+      <p class="card-desc">Oversized acetate in 6 dreamy colourways.</p>
+      <div class="card-footer">
+        <div><span class="price">$18</span></div>
+        <div class="hearts">🩷🩷🩷🩷🩷</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11 -->
+  <div class="card">
+    <div class="img-wrap">
+      <div class="wish-btn">♡</div>
+      <div class="sticker new-in">New<br>In</div>
+      <img src="https://images.unsplash.com/photo-1512695364132-a4dc6c683c82?w=600&q=80" alt="Nail Polish" />
+      <div class="quick-add">+ Quick Add</div>
+    </div>
+    <div class="card-body">
+      <span class="card-cat">Nails</span>
+      <h2 class="card-name">Glazen Nail Duo</h2>
+      <p class="card-desc">Glass-finish base + colour in cherry blossom.</p>
+      <div class="card-footer">
+        <div><span class="price">$26</span><span class="old-price">$34</span></div>
+        <div class="hearts">🩷🩷🩷🩷🤍</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12 -->
+  <div class="card tall">
+    <div class="img-wrap">
+      <div class="wish-btn">♡</div>
+      <div class="sticker hot">Fan<br>Fave</div>
+      <img src="https://images.unsplash.com/photo-1570194065650-d99fb4de8b2a?w=600&q=80" alt="Ribbon Choker" />
+      <div class="quick-add">+ Quick Add</div>
+    </div>
+    <div class="card-body">
+      <span class="card-cat">Jewellery</span>
+      <h2 class="card-name">Velvet Ribbon Choker</h2>
+      <p class="card-desc">Adjustable velvet with tiny bow charm. So cute.</p>
+      <div class="card-footer">
+        <div><span class="price">$15</span></div>
+        <div class="hearts">🩷🩷🩷🩷🩷</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p class="footer-title">✿ the shoppe ✿</p>
+  <p>Replace all items with your own products — just share the details!</p>
+</footer>
+
+<script>
+// Custom cursor
+const cur = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top  = e.clientY + 'px';
+});
+
+// Floating bg dots
+const bg = document.getElementById('bgDeco');
+for (let i = 0; i < 22; i++) {
+  const s = document.createElement('span');
+  const size = Math.random() * 120 + 20;
+  s.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random()*100}%;
+    top:${Math.random()*100}%;
+    animation-duration:${Math.random()*20+15}s;
+    animation-delay:${Math.random()*-20}s;
+  `;
+  bg.appendChild(s);
+}
+
+// Wishlist toggle
+document.querySelectorAll('.wish-btn').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    btn.textContent = btn.textContent === '♡' ? '♥' : '♡';
+    btn.style.background = btn.textContent === '♥' ? 'var(--pink)' : '';
+    btn.style.color = btn.textContent === '♥' ? 'var(--black)' : '';
+  });
+});
+
+// Filter pills (visual only)
+document.querySelectorAll('.pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

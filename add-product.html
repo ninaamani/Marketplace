@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>✿ Add a Product — The Shoppe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black:      #0f0a0d;
+  --black2:     #1a1018;
+  --black3:     #221820;
+  --pink:       #f472b6;
+  --pink-light: #fce7f3;
+  --pink-mid:   #fbcfe8;
+  --pink-hot:   #ec4899;
+  --pink-deep:  #be185d;
+  --white:      #fff9fc;
+  --cream:      #fdf4f8;
+  --muted:      #a0768c;
+  --muted2:     #7a5568;
+  --border:     rgba(244,114,182,0.18);
+  --border-focus: rgba(244,114,182,0.55);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  cursor: none;
+  overflow-x: hidden;
+}
+
+/* ── Custom cursor ── */
+#cursor {
+  position: fixed;
+  width: 18px; height: 18px;
+  background: var(--pink);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.08s ease, background 0.2s;
+  mix-blend-mode: difference;
+}
+
+/* ── Floating dots ── */
+.bg-deco {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.bg-deco span {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--pink);
+  opacity: 0.04;
+  animation: floatDot linear infinite;
+}
+@keyframes floatDot {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0.04; }
+  50%  { opacity: 0.08; }
+  100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}
+
+/* ── Back link ── */
+.back-link {
+  position: relative; z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 32px 0 0 36px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: none;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--pink); }
+.back-link .arrow { font-size: 14px; transition: transform 0.2s; }
+.back-link:hover .arrow { transform: translateX(-3px); }
+
+/* ── Page header ── */
+header {
+  position: relative; z-index: 2;
+  text-align: center;
+  padding: 48px 24px 44px;
+}
+.header-badge {
+  display: inline-block;
+  background: var(--pink-deep);
+  color: var(--pink-light);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 999px;
+  margin-bottom: 20px;
+}
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 6vw, 66px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--white);
+}
+.page-title .pop {
+  color: var(--pink);
+  font-style: italic;
+  display: inline-block;
+  animation: wobble 3s ease-in-out infinite;
+}
+@keyframes wobble {
+  0%, 100% { transform: rotate(-2deg) scale(1); }
+  50%       { transform: rotate(2deg) scale(1.04); }
+}
+.page-sub {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+.squiggle {
+  display: block;
+  margin: 20px auto 0;
+  width: 100px;
+  height: 14px;
+}
+
+/* ── Form container ── */
+.form-wrap {
+  position: relative; z-index: 2;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 24px 100px;
+}
+
+/* ── Section label ── */
+.section-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--pink-deep);
+  margin: 36px 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Field group ── */
+.field {
+  margin-bottom: 18px;
+}
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.field label .req {
+  color: var(--pink);
+  margin-left: 3px;
+}
+
+/* inputs + selects + textarea */
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  background: var(--black2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  padding: 13px 16px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  cursor: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.field input::placeholder,
+.field textarea::placeholder { color: #5a3d4f; }
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--border-focus);
+  background: var(--black3);
+  box-shadow: 0 0 0 3px rgba(244,114,182,0.08);
+}
+.field textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.6;
+}
+/* custom select arrow */
+.select-wrap {
+  position: relative;
+}
+.select-wrap::after {
+  content: '▾';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+  font-size: 12px;
+}
+.field select { padding-right: 36px; }
+.field select option {
+  background: var(--black2);
+  color: var(--white);
+}
+
+/* row of two */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* badge radio group */
+.badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.badge-option {
+  position: relative;
+}
+.badge-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+}
+.badge-option label {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: none;
+  transition: all 0.2s;
+  margin: 0;
+}
+.badge-option input[type="radio"]:checked + label {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: var(--black);
+}
+.badge-option label:hover {
+  border-color: rgba(244,114,182,0.5);
+  color: var(--pink);
+}
+
+/* hearts / rating row */
+.hearts-group {
+  display: flex;
+  gap: 8px;
+}
+.hearts-group label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  cursor: none;
+  margin: 0;
+  text-transform: uppercase;
+}
+.hearts-group input[type="radio"] {
+  display: none;
+}
+.hearts-group .heart-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px; height: 44px;
+  background: var(--black2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  transition: all 0.2s;
+  cursor: none;
+}
+.hearts-group input[type="radio"]:checked + .heart-btn {
+  background: rgba(244,114,182,0.15);
+  border-color: var(--pink);
+  color: var(--pink);
+}
+.hearts-group label:hover .heart-btn {
+  border-color: rgba(244,114,182,0.45);
+}
+
+/* tall card toggle */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.toggle-switch {
+  position: relative;
+  width: 44px; height: 24px;
+  flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--black3);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: background 0.2s, border-color 0.2s;
+  cursor: none;
+}
+.toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  background: var(--muted);
+  border-radius: 50%;
+  transition: transform 0.2s, background 0.2s;
+}
+.toggle-switch input:checked ~ .toggle-track { background: rgba(244,114,182,0.2); border-color: var(--pink); }
+.toggle-switch input:checked ~ .toggle-track .toggle-thumb { transform: translateX(20px); background: var(--pink); }
+.toggle-label {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.toggle-label strong { color: var(--white); font-weight: 400; display: block; margin-bottom: 1px; }
+
+/* ── Help text ── */
+.field-hint {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #5a3d4f;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+
+/* ── Submit button ── */
+.submit-wrap {
+  margin-top: 44px;
+  text-align: center;
+}
+.submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--pink);
+  color: var(--black);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border: none;
+  padding: 16px 48px;
+  border-radius: 999px;
+  cursor: none;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  min-width: 220px;
+}
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(236,72,153,0.4);
+}
+.submit-btn:active:not(:disabled) { transform: translateY(-1px); }
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.submit-btn .btn-spinner {
+  display: none;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(15,10,13,0.3);
+  border-top-color: var(--black);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.submit-btn.loading .btn-spinner { display: inline-block; }
+.submit-btn.loading .btn-text { opacity: 0.7; }
+
+/* ── Success overlay ── */
+.success-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 100;
+  background: rgba(15,10,13,0.82);
+  backdrop-filter: blur(12px);
+  align-items: center;
+  justify-content: center;
+}
+.success-overlay.visible { display: flex; }
+
+.success-card {
+  background: var(--black2);
+  border: 1px solid rgba(244,114,182,0.3);
+  border-radius: 28px;
+  padding: 56px 52px;
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+  animation: popIn 0.55s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.82) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.success-icon {
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: 20px;
+  display: block;
+  animation: bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+}
+@keyframes bounceIn {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+.success-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-style: italic;
+  color: var(--pink);
+  margin-bottom: 10px;
+}
+.success-msg {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+.success-redirect {
+  font-size: 11px;
+  color: #5a3d4f;
+  letter-spacing: 0.1em;
+}
+.success-bar-wrap {
+  width: 80px;
+  height: 3px;
+  background: var(--black3);
+  border-radius: 999px;
+  margin: 14px auto 0;
+  overflow: hidden;
+}
+.success-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--pink);
+  border-radius: 999px;
+  transition: width 2.8s linear;
+}
+
+/* ── Responsive ── */
+@media (max-width: 560px) {
+  .field-row { grid-template-columns: 1fr; }
+  .form-wrap { padding: 0 16px 80px; }
+  .back-link { margin-left: 16px; }
+  .success-card { padding: 40px 28px; }
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div class="bg-deco" id="bgDeco"></div>
+
+<!-- Back navigation -->
+<a href="index.html" class="back-link">
+  <span class="arrow">←</span>
+  <span>Back to Shoppe</span>
+</a>
+
+<!-- Page header -->
+<header>
+  <div class="header-badge">✦ Add a new listing ✦</div>
+  <h1 class="page-title">Enter a <span class="pop">Product</span></h1>
+  <p class="page-sub">Fill in the details below and we'll add it to the shoppe ✿</p>
+  <svg class="squiggle" viewBox="0 0 120 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 8 Q10 0 20 8 Q30 16 40 8 Q50 0 60 8 Q70 16 80 8 Q90 0 100 8 Q110 16 120 8" stroke="#f472b6" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  </svg>
+</header>
+
+<!-- Form -->
+<div class="form-wrap">
+
+  <div class="section-label">Product details</div>
+
+  <!-- Name -->
+  <div class="field">
+    <label for="name">Product Name <span class="req">*</span></label>
+    <input type="text" id="name" name="name" placeholder="e.g. Rose Glow Serum" required />
+  </div>
+
+  <!-- Category -->
+  <div class="field">
+    <label for="category">Category <span class="req">*</span></label>
+    <div class="select-wrap">
+      <select id="category" name="category" required>
+        <option value="" disabled selected>Choose a category…</option>
+        <option>Skincare</option>
+        <option>Fragrance</option>
+        <option>Makeup</option>
+        <option>Candles</option>
+        <option>Jewellery</option>
+        <option>Accessories</option>
+        <option>Tools</option>
+        <option>Body</option>
+        <option>Hair</option>
+        <option>Nails</option>
+        <option>Other</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="field">
+    <label for="description">Description <span class="req">*</span></label>
+    <textarea id="description" name="description" placeholder="Short, punchy description of the product…" required></textarea>
+    <p class="field-hint">Keep it to 1–2 sentences. This appears on the product card.</p>
+  </div>
+
+  <!-- Pricing row -->
+  <div class="section-label">Pricing</div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="price">Price <span class="req">*</span></label>
+      <input type="text" id="price" name="price" placeholder="e.g. $48" required />
+    </div>
+    <div class="field">
+      <label for="oldPrice">Original Price <span style="color:#5a3d4f;font-weight:300;">(optional)</span></label>
+      <input type="text" id="oldPrice" name="oldPrice" placeholder="e.g. $65 — shows strikethrough" />
+    </div>
+  </div>
+
+  <!-- Image URL -->
+  <div class="section-label">Image</div>
+
+  <div class="field">
+    <label for="imageUrl">Image URL <span class="req">*</span></label>
+    <input type="url" id="imageUrl" name="imageUrl" placeholder="https://images.unsplash.com/…?w=600&q=80" required />
+    <p class="field-hint">Use a direct image URL (Unsplash, Cloudinary, etc.). Recommended size: 600 × 600 px minimum.</p>
+  </div>
+
+  <!-- Badge -->
+  <div class="section-label">Badge / Sticker</div>
+
+  <div class="field">
+    <label>Badge type <span style="color:#5a3d4f;font-weight:300;">(optional)</span></label>
+    <div class="badge-group">
+      <div class="badge-option">
+        <input type="radio" name="badge" id="badge-none" value="" checked />
+        <label for="badge-none">None</label>
+      </div>
+      <div class="badge-option">
+        <input type="radio" name="badge" id="badge-hot" value="hot" />
+        <label for="badge-hot">🔥 Hot</label>
+      </div>
+      <div class="badge-option">
+        <input type="radio" name="badge" id="badge-new" value="new-in" />
+        <label for="badge-new">✨ New In</label>
+      </div>
+      <div class="badge-option">
+        <input type="radio" name="badge" id="badge-sale" value="sale" />
+        <label for="badge-sale">🏷 Sale</label>
+      </div>
+      <div class="badge-option">
+        <input type="radio" name="badge" id="badge-custom" value="custom" />
+        <label for="badge-custom">✏️ Custom</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="field" id="badgeTextWrap" style="display:none;">
+    <label for="badgeText">Custom badge text</label>
+    <input type="text" id="badgeText" name="badgeText" placeholder="e.g. Fan Fave · Best Buy · Duo Set" maxlength="12" />
+    <p class="field-hint">Max 12 characters. Two short lines look best (e.g. "Best<br>Buy").</p>
+  </div>
+
+  <!-- Hearts / rating -->
+  <div class="section-label">Rating</div>
+
+  <div class="field">
+    <label>Hearts (out of 5)</label>
+    <div class="hearts-group">
+      <label>
+        <input type="radio" name="hearts" value="1" />
+        <span class="heart-btn">🩷</span>
+        <span>1</span>
+      </label>
+      <label>
+        <input type="radio" name="hearts" value="2" />
+        <span class="heart-btn">🩷🩷</span>
+        <span>2</span>
+      </label>
+      <label>
+        <input type="radio" name="hearts" value="3" />
+        <span class="heart-btn">🩷🩷🩷</span>
+        <span>3</span>
+      </label>
+      <label>
+        <input type="radio" name="hearts" value="4" checked />
+        <span class="heart-btn">🩷🩷🩷🩷</span>
+        <span>4</span>
+      </label>
+      <label>
+        <input type="radio" name="hearts" value="5" />
+        <span class="heart-btn">🩷🩷🩷🩷🩷</span>
+        <span>5</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Card layout -->
+  <div class="section-label">Card layout</div>
+
+  <div class="field">
+    <div class="toggle-row">
+      <label class="toggle-switch">
+        <input type="checkbox" id="tall" name="tall" value="true" />
+        <span class="toggle-track">
+          <span class="toggle-thumb"></span>
+        </span>
+      </label>
+      <span class="toggle-label">
+        <strong>Tall card</strong>
+        Enable for a taller portrait-ratio card (great for clothing &amp; accessories).
+      </span>
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <div class="submit-wrap">
+    <button class="submit-btn" id="submitBtn" type="button" onclick="handleSubmit()">
+      <span class="btn-spinner"></span>
+      <span class="btn-text">✦ &nbsp; Add to Shoppe</span>
+    </button>
+  </div>
+
+</div><!-- /form-wrap -->
+
+<!-- Success overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-card">
+    <span class="success-icon">🌸</span>
+    <h2 class="success-title">Product added!</h2>
+    <p class="success-msg">Your darling product has been submitted to the shoppe.<br>It will appear once the sheet refreshes.</p>
+    <p class="success-redirect">Redirecting you back in a moment…</p>
+    <div class="success-bar-wrap">
+      <div class="success-bar" id="successBar"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─────────────────────────────────────────
+   CONFIG — paste your Google Apps Script URL here
+   ───────────────────────────────────────── */
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxhlOpJOIdB0dyM6Wef8vVmOXZ1lO3pPird2vc8vKfP6ZnPK2V5jCwwJW8jmaCVaTZk1g/exec";
+
+/* ── Custom cursor ── */
+const cur = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top  = e.clientY + 'px';
+});
+
+/* ── Floating bg dots ── */
+const bg = document.getElementById('bgDeco');
+for (let i = 0; i < 22; i++) {
+  const s = document.createElement('span');
+  const size = Math.random() * 100 + 20;
+  s.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random()*100}%;
+    top:${Math.random()*100}%;
+    animation-duration:${Math.random()*20+15}s;
+    animation-delay:${Math.random()*-20}s;
+  `;
+  bg.appendChild(s);
+}
+
+/* ── Show/hide custom badge text field ── */
+document.querySelectorAll('input[name="badge"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    document.getElementById('badgeTextWrap').style.display =
+      radio.value === 'custom' ? 'block' : 'none';
+  });
+});
+
+/* ── Build hearts string ── */
+function buildHearts(count) {
+  const n = parseInt(count, 10) || 4;
+  return '🩷'.repeat(n) + '🤍'.repeat(5 - n);
+}
+
+/* ── Collect form values ── */
+function getFormData() {
+  const badge     = document.querySelector('input[name="badge"]:checked')?.value || '';
+  const badgeText = badge === 'custom'
+    ? (document.getElementById('badgeText').value.trim() || 'New')
+    : badge;
+  const hearts    = document.querySelector('input[name="hearts"]:checked')?.value || '4';
+
+  return {
+    name:        document.getElementById('name').value.trim(),
+    category:    document.getElementById('category').value,
+    description: document.getElementById('description').value.trim(),
+    price:       document.getElementById('price').value.trim(),
+    oldPrice:    document.getElementById('oldPrice').value.trim(),
+    imageUrl:    document.getElementById('imageUrl').value.trim(),
+    badge:       badgeText,
+    hearts:      buildHearts(hearts),
+    tall:        document.getElementById('tall').checked ? 'true' : 'false',
+  };
+}
+
+/* ── Validate ── */
+function validate(data) {
+  if (!data.name)        { alert('Please enter a product name.'); return false; }
+  if (!data.category)    { alert('Please choose a category.'); return false; }
+  if (!data.description) { alert('Please add a description.'); return false; }
+  if (!data.price)       { alert('Please enter a price.'); return false; }
+  if (!data.imageUrl)    { alert('Please enter an image URL.'); return false; }
+  return true;
+}
+
+/* ── Show success & redirect ── */
+function showSuccess() {
+  const overlay = document.getElementById('successOverlay');
+  overlay.classList.add('visible');
+  // animate progress bar
+  setTimeout(() => {
+    document.getElementById('successBar').style.width = '100%';
+  }, 50);
+  // redirect after 3 s
+  setTimeout(() => {
+    window.location.href = 'index.html';
+  }, 3000);
+}
+
+/* ── Main submit handler ── */
+async function handleSubmit() {
+  const data = getFormData();
+  if (!validate(data)) return;
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  // Build URL params matching the variable names used in the sheet / HTML
+  const params = new URLSearchParams({
+    name:        data.name,
+    category:    data.category,
+    description: data.description,
+    price:       data.price,
+    oldPrice:    data.oldPrice,
+    imageUrl:    data.imageUrl,
+    badge:       data.badge,
+    hearts:      data.hearts,
+    tall:        data.tall,
+  });
+
+  try {
+    const url = `${WEB_APP_URL}?${params.toString()}`;
+    const response = await fetch(url, { method: 'GET', mode: 'no-cors' });
+    // no-cors means we can't read the response, but submission went through
+    showSuccess();
+  } catch (err) {
+    console.error('Submission error:', err);
+    alert('Something went wrong. Please check your WEB_APP_URL and try again.');
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+</script>
+</body>
+</html>
